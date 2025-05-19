@@ -1,5 +1,5 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import User from "../models/user.js";
+import User, {  validateLoginUser } from "../models/user.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
@@ -18,16 +18,7 @@ const csrf = csurf({
     secure: process.env.NODE_ENV === "production",
   },
 });
-const schema = Joi.object({
-  email: Joi.string().min(5).max(255).email().required(),
-  password: password_validator,
-  createdAt: Joi.date().optional(),
-  name: Joi.string().min(5).max(50).required(),
-});
 
-export const validate = (user: any) => {
-  return schema.validate(user);
-};
 authRoutes.use(csrf);
 authRoutes.post(
   "/",
@@ -35,7 +26,7 @@ authRoutes.post(
     const invalidLoginMessage = "Invalid Email Or Password";
     try {
       // Validate input
-      const { error } = validate(req.body);
+      const { error } = validateLoginUser(req.body);
       if (error) {
         return next(new AppError(error.message, 400));
       }
