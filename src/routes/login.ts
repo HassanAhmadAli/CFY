@@ -12,7 +12,7 @@ import csurf from "csurf";
 const authRoutes = express.Router();
 
 const csrf = csurf({
-  ignoreMethods: ["POST"],
+  ignoreMethods: ["POST","OPTIONS"],
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
