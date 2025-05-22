@@ -13,11 +13,18 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-
+import cors from "cors";
 const app = express();
 app.use(async (req, res, next) => {
   setTimeout(next, 1000);
 });
+
+// Bypass Cors Protection Requests 🤨
+app.use(
+  cors({
+    origin: /^.*/,
+  })
+);
 app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
