@@ -5,8 +5,8 @@
   "main": "out/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm install && npx tsx src\\app.ts",
-    "pstart": "pnpm install && pnpm dlx tsx src\\app.ts",
+    "install" : "npm install",
+    "start": "npx tsx src\\app.ts",
     "dev": "npx tsc-watch --onSuccess \"node .\\out\\app.js\"",
     "dev-nobuild": "npx tsx watch --include src\\  src/app.ts"
   },
