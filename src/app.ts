@@ -8,6 +8,7 @@ import authMiddleware from "./middleware/auth.js";
 import authRoutes from "./routes/login.js";
 import welcomeRoutes from "./routes/welcome.js";
 import env from "./utils/env.js";
+import { sendingMail } from "./lib/nodemailer.js";
 import publicRouter from "./routes/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";

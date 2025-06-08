@@ -5,7 +5,7 @@
   "main": "out/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install" : "npm install",
+    "install": "npm install",
     "start": "npx tsx src\\app.ts",
     "dev": "npx tsc-watch --onSuccess \"node .\\out\\app.js\"",
     "dev-nobuild": "npx tsx watch --include src\\  src/app.ts"
@@ -51,6 +51,7 @@
     "@types/joi-password-complexity": "^3.1.0",
     "@types/logger": "^0.0.5",
     "@types/morgan": "^1.9.9",
+    "@types/nodemailer": "^6.4.17",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
     "config": "^3.3.12",
@@ -67,6 +68,7 @@
     "lodash": "^4.17.21",
     "logger": "^0.0.1",
     "mongoose": "^8.14.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "nodemailer": "^7.0.3"
   }
 }
