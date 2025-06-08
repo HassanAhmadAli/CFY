@@ -1,5 +1,5 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import User, { validateSignupUser } from "../models/user.js";
+import { User, validateSignupUser } from "../models/user.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";

@@ -1,5 +1,5 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import User, {  validateLoginUser } from "../models/user.js";
+import { User, validateLoginUser } from "../models/user.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
@@ -7,12 +7,12 @@ import _ from "lodash";
 import Joi from "joi";
 import password_validator from "../utils/password_validator.js";
 import jsonwebtoken from "jsonwebtoken";
-import env from "../utils/env.js";
+import { env } from "../utils/env.js";
 import csurf from "csurf";
 const authRoutes = express.Router();
 
 const csrf = csurf({
-  ignoreMethods: ["POST","OPTIONS"],
+  ignoreMethods: ["POST", "OPTIONS"],
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

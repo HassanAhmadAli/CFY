@@ -2,13 +2,13 @@
   "name": "cfy",
   "version": "1.0.0",
   "description": "",
-  "main": "out/app.js",
+  "main": "out/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install": "npm install",
-    "start": "npx tsx src\\app.ts",
-    "dev": "npx tsc-watch --onSuccess \"node .\\out\\app.js\"",
-    "dev-nobuild": "npx tsx watch --include src\\  src/app.ts"
+    "start": "npx tsx src\\server.ts",
+    "dev": "npx tsc-watch --onSuccess \"node .\\out\\server.js\"",
+    "dev-nobuild": "npx tsx watch --include src\\  src/server.ts"
   },
   "repository": {
     "type": "git",
@@ -69,6 +69,7 @@
     "logger": "^0.0.1",
     "mongoose": "^8.14.1",
     "morgan": "^1.10.0",
-    "nodemailer": "^7.0.3"
+    "nodemailer": "^7.0.3",
+    "zod": "^3.25.56"
   }
 }

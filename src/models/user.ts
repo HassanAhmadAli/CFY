@@ -1,7 +1,7 @@
 import mongoose, { InferSchemaType } from "mongoose";
 import Joi from "joi";
 import password_validator from "../utils/password_validator.js";
-import env from "../utils/env.js";
+import { env } from "../utils/env.js";
 import jsonwebtoken from "jsonwebtoken";
 import _ from "lodash";
 
@@ -48,4 +48,4 @@ export const validateLoginUser = (user: any) => {
   return Joi.object(LoginUserValidationProperties).validate(user);
 };
 
-export default User;
+export { User };
