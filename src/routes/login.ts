@@ -1,24 +1,24 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import { User, validateLoginUser } from "../models/user.js";
-import mongoose from "mongoose";
+import {
+  UserModel,
+  LoginUserInputSchema,
+  comparePasswordWithHash,
+} from "../models/user.js";
+
 import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
 import _ from "lodash";
-import Joi from "joi";
-import password_validator from "../utils/password_validator.js";
-import jsonwebtoken from "jsonwebtoken";
-import { env } from "../utils/env.js";
+import { z, ZodError } from "../lib/zod.js";
 import csurf from "csurf";
+import { env } from "../utils/env.js";
 const authRoutes = express.Router();
-
 const csrf = csurf({
-  ignoreMethods: ["POST", "OPTIONS"],
+  ignoreMethods: ["POST"],
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: env.NODE_ENV === "production",
   },
 });
-
 authRoutes.use(csrf);
 authRoutes.post(
   "/",
@@ -26,19 +26,13 @@ authRoutes.post(
     const invalidLoginMessage = "Invalid Email Or Password";
     try {
       // Validate input
-      const { error } = validateLoginUser(req.body);
-      if (error) {
-        return next(new AppError(error.message, 400));
-      }
-
-      // Check if user already exists
-
-      const existingUser = await User.findOne({ email: req.body.email });
+      const data = LoginUserInputSchema.parse(req.body);
+      const existingUser = await UserModel.findOne({ email: data.email });
       if (!existingUser) {
         return next(new AppError(invalidLoginMessage, 409));
       }
-      const validPassword = await bcrypt.compare(
-        req.body.password,
+      const validPassword = await comparePasswordWithHash(
+        data.password,
         existingUser.password
       );
       if (!validPassword) {
@@ -47,6 +41,9 @@ authRoutes.post(
       const token = existingUser.getJsonWebToken();
       res.status(200).json({ token: token, csrfToken: req.csrfToken() });
     } catch (error: any) {
+      if (error instanceof ZodError) {
+        return next(AppError.fromZodError(error, 400));
+      }
       next(new AppError(error.message, 500));
     }
   }
