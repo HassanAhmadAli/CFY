@@ -9,12 +9,14 @@ const app: Router = express.Router();
 app.post("/", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = UserInputSchema.parse(req.body);
-    const existingUser = await UserModel.findOne({ email: data.email });
     const user = new UserModel({
       ..._.omit(data, ["password"]),
       password: await hashPassword(data.password),
     });
+
     const newUser = await user.save();
+    const pin = await user.setVerificationPin();
+    console.log(pin);
     const token = newUser.getJsonWebToken();
     res.header("x-auth-token", token).status(201).json({ token: token });
   } catch (error: any) {

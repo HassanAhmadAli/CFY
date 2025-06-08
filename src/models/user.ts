@@ -6,14 +6,24 @@ import { z } from "../lib/zod.js";
 import bcrypt from "bcrypt";
 const UserMongooseSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: mongoose.SchemaTypes.String, required: true },
+    email: { type: mongoose.SchemaTypes.String, required: true, unique: true },
+    password: { type: mongoose.SchemaTypes.String, required: true },
+    isVerified: {
+      type: mongoose.SchemaTypes.Boolean,
+      required: false,
+      default: false,
+    },
+    verificationPin: {
+      pin: { type: mongoose.SchemaTypes.String, required: false },
+      expiresAt: { type: mongoose.SchemaTypes.Date, required: false },
+    },
   },
   { timestamps: true }
 );
 export interface UserDoc extends InferSchemaType<typeof UserMongooseSchema> {
   getJsonWebToken: () => string;
+  setVerificationPin: () => Promise<number>;
 }
 
 UserMongooseSchema.methods.getJsonWebToken = function (): string {
@@ -22,6 +32,16 @@ UserMongooseSchema.methods.getJsonWebToken = function (): string {
   const token = jsonwebtoken.sign(_.pick(this, "_id"), jwt_secret);
   return token;
 };
+UserMongooseSchema.methods.setVerificationPin =
+  async function (): Promise<string> {
+    const pin = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit pin
+    this.verificationPin = {
+      pin: pin,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // Expires in 30 minutes
+    };
+    await this.save();
+    return pin;
+  };
 export const UserModel = mongoose.model<UserDoc>("User", UserMongooseSchema);
 
 export const UserInputSchema = z.object({

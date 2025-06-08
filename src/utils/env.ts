@@ -10,7 +10,7 @@ const envSchema = z
       .default(
         "THIS_SHOULD_NEVER_BE_NULL_IN_REAL_APPLICATION_UNDER_ANY_CIRCUMSTANCE"
       ),
-    PORT: z.string().default("3008"),
+    PORT: z.string().default("3009"),
     NODE_ENV: z.enum(["production", "development"]).default("production"),
   })
   .loose();

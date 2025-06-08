@@ -5,7 +5,7 @@ import { app } from "./app.js";
 const server = createServer(app);
 
 try {
-  await mongoose.connect(env.MONGODB_URI, { dbName: "Yasmeen" });
+  await mongoose.connect(env.MONGODB_URI, { dbName: "CFY" });
   console.log(`Connected to MongoDB with uri \n${env.MONGODB_URI}\n`);
   server.listen(env.PORT, () => {
     console.log(`Server is running on port ${env.PORT}`);
