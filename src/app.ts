@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
-import signupRoute from "./routes/signup.js";
+import {signupRoute} from "./routes/signup.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import authRoutes from "./routes/login.js";
+import {loginRoute} from "./routes/login.js";
 import { env } from "./utils/env.js";
-import publicRouter from "./routes/public.js";
+import {publicRouter} from "./routes/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
@@ -34,8 +34,8 @@ app.use(
   })
 );
 app.use("/api/signup", signupRoute);
-app.use("/api/login", authRoutes);
-app.use("/api/login", authRoutes);
+app.use("/api/login", loginRoute);
+app.use("/api/login", loginRoute);
 
 app.use("/public", publicRouter);
 app.use(

@@ -9,7 +9,7 @@ import _ from "lodash";
 import { ZodError } from "../lib/zod.js";
 import csurf from "csurf";
 import { env } from "../utils/env.js";
-const authRoutes = express.Router();
+const loginRoute = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
   cookie: {
@@ -17,32 +17,34 @@ const csrf = csurf({
     secure: env.NODE_ENV === "production",
   },
 });
-authRoutes.use(csrf);
-authRoutes.post(
+loginRoute.use(csrf);
+loginRoute.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
     const invalidLoginMessage = "Invalid Email Or Password";
-    try {
-      const data = LoginUserInputSchema.parse(req.body);
-      const existingUser = await UserModel.findOne({ email: data.email });
-      if (!existingUser) {
-        return next(new AppError(invalidLoginMessage, 409));
-      }
-      const validPassword = await comparePasswordWithHash(
-        data.password,
-        existingUser.password
-      );
-      if (!validPassword) {
-        return next(new AppError(invalidLoginMessage, 409));
-      }
-      const token = existingUser.getJsonWebToken();
-      res.status(200).json({ token: token, csrfToken: req.csrfToken() });
-    } catch (error: any) {
-      if (error instanceof ZodError) {
-        return next(AppError.fromZodError(error, 400));
-      }
-      next(new AppError(error.message, 500));
+    const data = LoginUserInputSchema.parse(req.body);
+    const existingUser = await UserModel.findOne({ email: data.email });
+    if (!existingUser) {
+      return next(new AppError(invalidLoginMessage, 409));
     }
+    const validPassword = await comparePasswordWithHash(
+      data.password,
+      existingUser.password
+    );
+    if (!validPassword) {
+      return next(new AppError(invalidLoginMessage, 409));
+    }
+    const token = existingUser.getJsonWebToken();
+    res.status(200).json({ token: token, csrfToken: req.csrfToken() });
   }
 );
-export default authRoutes;
+
+loginRoute.use(
+  (error: Error | AppError, req: Request, res: any, next: NextFunction) => {
+    if (error instanceof ZodError) {
+      return next(AppError.fromZodError(error, 400));
+    }
+    return next(new AppError(error.message, 500));
+  }
+);
+export { loginRoute };
