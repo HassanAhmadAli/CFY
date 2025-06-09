@@ -13,7 +13,7 @@ const envSchema = z
     NODE_ENV: z.enum(["production", "development"]).default("production"),
     email: z.email().or(z.literal("")).default(""),
     emailpassword: z.string().or(z.literal("")).default(""),
-    offline: z.boolean().default(true),
+    offline: z.string().default("true"),
   })
   .loose();
 

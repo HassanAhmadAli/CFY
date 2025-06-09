@@ -13,7 +13,6 @@ export const errorHandler = (
     });
   }
 
-  // Handle unexpected errors
   console.error("Unhandled error:", error);
   return res.status(500).json({
     status: "error",
