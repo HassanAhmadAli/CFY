@@ -15,8 +15,8 @@ const UserMongooseSchema = new mongoose.Schema(
       default: false,
     },
     verificationPin: {
-      pin: { type: mongoose.SchemaTypes.String, required: false },
-      expiresAt: { type: mongoose.SchemaTypes.Date, required: false },
+      pin: { type: mongoose.SchemaTypes.Number, required: false },
+      expiresAt: { type: Date, required: false },
     },
   },
   { timestamps: true }

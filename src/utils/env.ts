@@ -12,6 +12,8 @@ const envSchema = z
       ),
     PORT: z.string().default("3009"),
     NODE_ENV: z.enum(["production", "development"]).default("production"),
+    email: z.email(),
+    emailpassword: z.string().min(8),
   })
   .loose();
 

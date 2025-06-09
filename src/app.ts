@@ -35,6 +35,8 @@ app.use(
 );
 app.use("/api/signup", signupRoute);
 app.use("/api/login", authRoutes);
+app.use("/api/login", authRoutes);
+
 app.use("/public", publicRouter);
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {

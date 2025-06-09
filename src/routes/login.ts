@@ -4,11 +4,9 @@ import {
   LoginUserInputSchema,
   comparePasswordWithHash,
 } from "../models/user.js";
-
-import bcrypt from "bcrypt";
 import { AppError } from "../utils/errors.js";
 import _ from "lodash";
-import { z, ZodError } from "../lib/zod.js";
+import { ZodError } from "../lib/zod.js";
 import csurf from "csurf";
 import { env } from "../utils/env.js";
 const authRoutes = express.Router();
@@ -25,7 +23,6 @@ authRoutes.post(
   async (req: Request, res: Response, next: NextFunction) => {
     const invalidLoginMessage = "Invalid Email Or Password";
     try {
-      // Validate input
       const data = LoginUserInputSchema.parse(req.body);
       const existingUser = await UserModel.findOne({ email: data.email });
       if (!existingUser) {
@@ -48,5 +45,4 @@ authRoutes.post(
     }
   }
 );
-
 export default authRoutes;

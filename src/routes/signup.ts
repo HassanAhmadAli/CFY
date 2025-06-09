@@ -4,6 +4,8 @@ import { AppError } from "../utils/errors.js";
 import _ from "lodash";
 import { z, ZodError } from "../lib/zod.js";
 import mongoose, { MongooseError } from "mongoose";
+import { sendingMail } from "../lib/nodemailer.js";
+import { env } from "../utils/env.js";
 const app: Router = express.Router();
 
 app.post("/", async (req: Request, res: Response, next: NextFunction) => {
@@ -13,10 +15,19 @@ app.post("/", async (req: Request, res: Response, next: NextFunction) => {
       ..._.omit(data, ["password"]),
       password: await hashPassword(data.password),
     });
-
     const newUser = await user.save();
     const pin = await user.setVerificationPin();
-    console.log(pin);
+    try {
+      const x = await sendingMail({
+        from: env.email,
+        to: data.email,
+        subject: "Confirmation Code to register for CFY Store",
+        text: `please enter the following pin in the page to continue<br/>${pin}`,
+      });
+      console.log(x);
+    } catch (e) {
+      console.error(e);
+    }
     const token = newUser.getJsonWebToken();
     res.header("x-auth-token", token).status(201).json({ token: token });
   } catch (error: any) {
@@ -31,5 +42,4 @@ app.post("/", async (req: Request, res: Response, next: NextFunction) => {
     next(new AppError(error.message, 500));
   }
 });
-// MongoServerError
 export default app;
