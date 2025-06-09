@@ -1,19 +1,19 @@
 import dotenv from "dotenv";
 dotenv.config({});
-import { z } from "../lib/zod.js";
-import { prettifyError } from "zod/v4";
+import { z, prettifyError } from "../lib/zod.js";
 const envSchema = z
   .object({
     MONGODB_URI: z.string().default("mongodb://localhost:27017"),
     jwtPrivateKey: z
       .string()
       .default(
-        "THIS_SHOULD_NEVER_BE_NULL_IN_REAL_APPLICATION_UNDER_ANY_CIRCUMSTANCE"
+        "SECRET=_______THIS_SHOULD_NEVER_BE_NULL_IN_REAL_APPLICATION_UNDER_ANY_CIRCUMSTANCE__________"
       ),
     PORT: z.string().default("3009"),
     NODE_ENV: z.enum(["production", "development"]).default("production"),
-    email: z.email(),
-    emailpassword: z.string().min(8),
+    email: z.email().or(z.literal("")).default(""),
+    emailpassword: z.string().or(z.literal("")).default(""),
+    offline: z.boolean().default(true),
   })
   .loose();
 
