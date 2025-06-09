@@ -24,6 +24,7 @@ const UserMongooseSchema = new mongoose.Schema(
 export interface UserDoc extends InferSchemaType<typeof UserMongooseSchema> {
   getJsonWebToken: () => string;
   setVerificationPin: () => Promise<number>;
+  setVerificationPinOffline: () => Promise<number>;
 }
 
 UserMongooseSchema.methods.getJsonWebToken = function (): string {
@@ -33,8 +34,19 @@ UserMongooseSchema.methods.getJsonWebToken = function (): string {
   return token;
 };
 UserMongooseSchema.methods.setVerificationPin =
-  async function (): Promise<string> {
-    const pin = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit pin
+  async function (): Promise<number> {
+    const pin = Math.floor(100000 + Math.random() * 900000); // 6-digit pin
+    this.verificationPin = {
+      pin: pin,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // Expires in 30 minutes
+    };
+    await this.save();
+    return pin;
+  };
+
+UserMongooseSchema.methods.setVerificationPinOffline =
+  async function (): Promise<number> {
+    const pin = 123456;
     this.verificationPin = {
       pin: pin,
       expiresAt: new Date(Date.now() + 30 * 60 * 1000), // Expires in 30 minutes

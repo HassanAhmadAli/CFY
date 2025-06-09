@@ -2,7 +2,7 @@ import express, { Request, Response, Router, NextFunction } from "express";
 import { UserModel, UserInputSchema, hashPassword } from "../../models/user.js";
 import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { z, ZodError } from "../../lib/zod.js";
+import { ZodError } from "../../lib/zod.js";
 import mongoose, { MongooseError } from "mongoose";
 import { sendingMail } from "../../lib/nodemailer.js";
 import { env } from "../../utils/env.js";
@@ -17,20 +17,23 @@ signupRoute.post(
       password: await hashPassword(data.password),
     });
     const newUser = await user.save();
-    const pin = await user.setVerificationPin();
-    try {
+    if (env.email) {
+      const pin = await user.setVerificationPin();
       const x = await sendingMail({
         from: env.email,
         to: data.email,
         subject: "Confirmation Code to register for CFY Store",
         text: `please enter the following pin in the page to continue<br/>${pin}`,
       });
-      console.log(x);
-    } catch (e) {
-      console.error(e);
+    } else {
+      const pin = await user.setVerificationPinOffline();
     }
+
     const token = newUser.getJsonWebToken();
-    res.header("x-auth-token", token).status(201).json({ token: token });
+    res.header("x-auth-token", token);
+    res
+      .status(201)
+      .json({ token: token, message: "you need to confirm your email" });
   }
 );
 signupRoute.use(
