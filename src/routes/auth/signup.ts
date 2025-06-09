@@ -11,39 +11,39 @@ const signupRoute = express.Router();
 signupRoute.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = UserInputSchema.parse(req.body);
-    const user = new UserModel({
-      ..._.omit(data, ["password"]),
-      password: await hashPassword(data.password),
-    });
-    const newUser = await user.save();
-    if (env.email) {
-      const pin = await user.setVerificationPin();
-      const x = await sendingMail({
-        from: env.email,
-        to: data.email,
-        subject: "Confirmation Code to register for CFY Store",
-        text: `please enter the following pin in the page to continue<br/>${pin}`,
+    try {
+      const data = UserInputSchema.parse(req.body);
+      const user = new UserModel({
+        ..._.omit(data, ["password"]),
+        password: await hashPassword(data.password),
       });
-    } else {
-      const pin = await user.setVerificationPinOffline();
-    }
-
-    const token = newUser.getJsonWebToken();
-    res.header("x-auth-token", token);
-    res
-      .status(201)
-      .json({ token: token, message: "you need to confirm your email" });
-  }
-);
-signupRoute.use(
-  (error: Error | AppError, req: Request, res: any, next: NextFunction) => {
-    if (error instanceof mongoose.mongo.MongoServerError) {
-      if (error.code === 11000) {
-        return next(new AppError("User already exists", 409));
+      const newUser = await user.save();
+      if (env.email) {
+        const pin = await user.setVerificationPin();
+        const x = await sendingMail({
+          from: env.email,
+          to: data.email,
+          subject: "Confirmation Code to register for CFY Store",
+          text: `please enter the following pin in the page to continue<br/>${pin}`,
+        });
+      } else {
+        const pin = await user.setVerificationPinOffline();
       }
+
+      const token = newUser.getJsonWebToken();
+      res.header("x-auth-token", token);
+      res
+        .status(201)
+        .json({ token: token, message: "you need to confirm your email" });
+    } catch (error) {
+      if (error instanceof mongoose.mongo.MongoServerError) {
+        if (error.code === 11000) {
+          return next(new AppError("User already exists", 409));
+        }
+      }
+      return next(error);
     }
-    return next(error);
   }
 );
+
 export { signupRoute };

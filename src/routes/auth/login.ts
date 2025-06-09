@@ -22,18 +22,22 @@ loginRoute.post(
   async (req: Request, res: Response, next: NextFunction) => {
     const invalidLoginMessage = "Invalid Email Or Password";
     const data = LoginUserInputSchema.parse(req.body);
-    const existingUser = await UserModel.findOne({ email: data.email });
-    if (!existingUser) {
+    const user = await UserModel.findOne({ email: data.email });
+    if (!user) {
       return next(new AppError(invalidLoginMessage, 409));
     }
+    if (!user.isVerified) {
+      return next(new AppError("User Need Verification", 500));
+    }
+
     const validPassword = await comparePasswordWithHash(
       data.password,
-      existingUser.password
+      user.password
     );
     if (!validPassword) {
       return next(new AppError(invalidLoginMessage, 409));
     }
-    const token = existingUser.getJsonWebToken();
+    const token = user.getJsonWebToken();
     res.status(200).json({ token: token, csrfToken: req.csrfToken() });
   }
 );

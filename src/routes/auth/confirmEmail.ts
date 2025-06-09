@@ -28,7 +28,7 @@ confirmEmailRoute.post(
     if (!user) {
       return next(new AppError("User Does Not Exist", 404));
     }
-    if (!user.verificationPin) {
+    if (!user.verificationPin?.pin) {
       return next(new AppError("No verification PIN found", 400));
     }
     if (user.verificationPin.pin !== data.pin) {
