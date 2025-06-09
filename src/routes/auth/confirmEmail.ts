@@ -1,10 +1,10 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import { UserModel } from "../models/user.js";
-import { AppError } from "../utils/errors.js";
+import { UserModel } from "../../models/user.js";
+import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { z, ZodError } from "../lib/zod.js";
+import { z, ZodError } from "../../lib/zod.js";
 import csurf from "csurf";
-import { env } from "../utils/env.js";
+import { env } from "../../utils/env.js";
 const authRoutes = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],

@@ -3,12 +3,12 @@ import {
   UserModel,
   LoginUserInputSchema,
   comparePasswordWithHash,
-} from "../models/user.js";
-import { AppError } from "../utils/errors.js";
+} from "../../models/user.js";
+import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { ZodError } from "../lib/zod.js";
+import { ZodError } from "../../lib/zod.js";
 import csurf from "csurf";
-import { env } from "../utils/env.js";
+import { env } from "../../utils/env.js";
 const loginRoute = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],

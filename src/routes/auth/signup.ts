@@ -1,11 +1,11 @@
 import express, { Request, Response, Router, NextFunction } from "express";
-import { UserModel, UserInputSchema, hashPassword } from "../models/user.js";
-import { AppError } from "../utils/errors.js";
+import { UserModel, UserInputSchema, hashPassword } from "../../models/user.js";
+import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { z, ZodError } from "../lib/zod.js";
+import { z, ZodError } from "../../lib/zod.js";
 import mongoose, { MongooseError } from "mongoose";
-import { sendingMail } from "../lib/nodemailer.js";
-import { env } from "../utils/env.js";
+import { sendingMail } from "../../lib/nodemailer.js";
+import { env } from "../../utils/env.js";
 const signupRoute = express.Router();
 
 signupRoute.post(

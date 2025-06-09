@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
-import {signupRoute} from "./routes/signup.js";
+import {signupRoute} from "./routes/auth/signup.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import {loginRoute} from "./routes/login.js";
+import {loginRoute} from "./routes/auth/login.js";
 import { env } from "./utils/env.js";
-import {publicRouter} from "./routes/public.js";
+import {publicRouter} from "./routes/simple/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";

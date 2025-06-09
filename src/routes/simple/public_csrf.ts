@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
-import authMiddleware from "../middleware/auth.js";
-import { publicDir } from "../utils/path.js";
+import authMiddleware from "../../middleware/auth.js";
+import { publicDir } from "../../utils/path.js";
 const router = express.Router();
 import csurf from "csurf";
 
