@@ -11,30 +11,13 @@ const signupRoute = express.Router();
 signupRoute.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
+    const data = UserInputSchema.parse(req.body);
+    let user = new UserModel({
+      ..._.omit(data, ["password"]),
+      password: await hashPassword(data.password),
+    });
     try {
-      const data = UserInputSchema.parse(req.body);
-      const user = new UserModel({
-        ..._.omit(data, ["password"]),
-        password: await hashPassword(data.password),
-      });
-      const newUser = await user.save();
-      if (env.email) {
-        const pin = await user.setVerificationPin();
-        const x = await sendingMail({
-          from: env.email,
-          to: data.email,
-          subject: "Confirmation Code to register for CFY Store",
-          text: `please enter the following pin in the page to continue<br/>${pin}`,
-        });
-      } else {
-        const pin = await user.setVerificationPinOffline();
-      }
-
-      const token = newUser.getJsonWebToken();
-      res.header("x-auth-token", token);
-      res
-        .status(201)
-        .json({ token: token, message: "you need to confirm your email" });
+      await user.save();
     } catch (error) {
       if (error instanceof mongoose.mongo.MongoServerError) {
         if (error.code === 11000) {
@@ -43,6 +26,22 @@ signupRoute.post(
       }
       return next(error);
     }
+    if (env.email) {
+      const pin = await user.setVerificationPin();
+      const x = await sendingMail({
+        from: env.email,
+        to: data.email,
+        subject: "Confirmation Code to register for CFY Store",
+        text: `please enter the following pin in the page to continue<br/>${pin}`,
+      });
+    } else {
+      const pin = await user.setVerificationPinOffline();
+    }
+    const token = user.getJsonWebToken();
+    res.header("x-auth-token", token);
+    res
+      .status(201)
+      .json({ token: token, message: "you need to confirm your email" });
   }
 );
 

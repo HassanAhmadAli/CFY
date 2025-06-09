@@ -29,7 +29,6 @@ loginRoute.post(
     if (!user.isVerified) {
       return next(new AppError("User Need Verification", 500));
     }
-
     const validPassword = await comparePasswordWithHash(
       data.password,
       user.password
