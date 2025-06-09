@@ -43,10 +43,7 @@ signupRoute.use(
         return next(new AppError("User already exists", 409));
       }
     }
-    if (error instanceof ZodError) {
-      return next(AppError.fromZodError(error, 400));
-    }
-    next(new AppError(error.message, 500));
+    return next(error);
   }
 );
 export { signupRoute };

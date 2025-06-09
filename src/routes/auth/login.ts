@@ -6,7 +6,6 @@ import {
 } from "../../models/user.js";
 import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { ZodError } from "../../lib/zod.js";
 import csurf from "csurf";
 import { env } from "../../utils/env.js";
 const loginRoute = express.Router();
@@ -39,12 +38,4 @@ loginRoute.post(
   }
 );
 
-loginRoute.use(
-  (error: Error | AppError, req: Request, res: any, next: NextFunction) => {
-    if (error instanceof ZodError) {
-      return next(AppError.fromZodError(error, 400));
-    }
-    return next(new AppError(error.message, 500));
-  }
-);
 export { loginRoute };

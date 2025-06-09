@@ -5,7 +5,7 @@ import _ from "lodash";
 import { z, ZodError } from "../../lib/zod.js";
 import csurf from "csurf";
 import { env } from "../../utils/env.js";
-const authRoutes = express.Router();
+const confirmEmailRoute = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
   cookie: {
@@ -17,8 +17,8 @@ const ConfirmDataInput = z.object({
   email: z.email(),
   pin: z.number(),
 });
-authRoutes.use(csrf);
-authRoutes.post(
+confirmEmailRoute.use(csrf);
+confirmEmailRoute.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
     const data = ConfirmDataInput.parse(req.body);
@@ -47,12 +47,4 @@ authRoutes.post(
   }
 );
 
-authRoutes.use(
-  (error: Error | AppError, req: Request, res: any, next: NextFunction) => {
-    if (error instanceof ZodError) {
-      return next(AppError.fromZodError(error, 400));
-    }
-    return next(new AppError(error.message, 500));
-  }
-);
-export default authRoutes;
+export { confirmEmailRoute };

@@ -1,9 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
-import {signupRoute} from "./routes/auth/signup.js";
+import { signupRoute } from "./routes/auth/signup.js";
 import { errorHandler } from "./middleware/errorHandler.js";
-import {loginRoute} from "./routes/auth/login.js";
+import { loginRoute } from "./routes/auth/login.js";
+import { confirmEmailRoute } from "./routes/auth/confirmEmail.js";
+
 import { env } from "./utils/env.js";
-import {publicRouter} from "./routes/simple/public.js";
+import { publicRouter } from "./routes/simple/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
@@ -35,14 +37,8 @@ app.use(
 );
 app.use("/api/signup", signupRoute);
 app.use("/api/login", loginRoute);
-app.use("/api/login", loginRoute);
+app.use("/api/auth/confirm", confirmEmailRoute);
 
 app.use("/public", publicRouter);
-app.use(
-  (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log(req.url);
-    next();
-  }
-);
 app.use(errorHandler);
 export { app };
