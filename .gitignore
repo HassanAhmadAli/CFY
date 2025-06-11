@@ -6,3 +6,4 @@ out/app.js
 pnpm-lock.yaml
 pnpm-workspace.yaml
 .env
+package-lock.json

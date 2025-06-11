@@ -5,8 +5,7 @@
   "main": "out/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
-    "start": "npx tsx src\\server.ts",
+    "start": "npm install && npx tsx src\\server.ts",
     "dev": "npx tsc-watch --onSuccess \"node .\\out\\server.js\"",
     "dev-nobuild": "npx tsx watch --include src\\  src/server.ts"
   },
