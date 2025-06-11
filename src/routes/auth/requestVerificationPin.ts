@@ -5,7 +5,7 @@ import _ from "lodash";
 import { z, ZodError } from "../../lib/zod.js";
 import csurf from "csurf";
 import { env } from "../../utils/env.js";
-const confirmEmailRoute = express.Router();
+const requestVerificationPin = express.Router();
 const csrf = csurf({
   ignoreMethods: ["POST"],
   cookie: {
@@ -13,39 +13,28 @@ const csrf = csurf({
     secure: env.NODE_ENV === "production",
   },
 });
-const ConfirmDataInput = z.object({
+const ResetPasswordInput = z.object({
   email: z.email(),
-  pin: z.number(),
 });
-confirmEmailRoute.use(csrf);
-confirmEmailRoute.post(
+requestVerificationPin.use(csrf);
+requestVerificationPin.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = ConfirmDataInput.parse(req.body);
+    const data = ResetPasswordInput.parse(req.body);
     const user = await UserModel.findOne({
       email: data.email,
     }).exec();
     if (!user) {
       return next(new AppError("User Does Not Exist", 404));
     }
-
     if (!user.verificationPin?.pin) {
-      return next(new AppError("No verification PIN found", 400));
+      await user.setVerificationPin();
     }
-    if (user.verificationPin.pin !== data.pin) {
-      return next(new AppError("Verification PIN Incorrect", 400));
-    }
-    const now = new Date(Date.now());
-    const expiryDate = user.verificationPin.expiresAt;
-    if (!expiryDate || now > expiryDate) {
-      return next(new AppError("Verification PIN has expired", 401));
-    }
-    user.verificationPin = null;
-    user.isVerified = true;
+    user.sendVerificationEmail();
     await user.save();
-    res.status(200).json({ message: "User Verified Successfully" });
+    res.status(200).json({ message: "Pin Code Sent" });
     return;
   }
 );
 
-export { confirmEmailRoute };
+export { requestVerificationPin };

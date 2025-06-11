@@ -4,6 +4,8 @@ import jsonwebtoken from "jsonwebtoken";
 import _ from "lodash";
 import { z } from "../lib/zod.js";
 import bcrypt from "bcrypt";
+import { sendingMail } from "../lib/nodemailer.js";
+
 const UserMongooseSchema = new mongoose.Schema(
   {
     name: { type: mongoose.SchemaTypes.String, required: true },
@@ -24,18 +26,20 @@ const UserMongooseSchema = new mongoose.Schema(
 export interface UserDoc extends InferSchemaType<typeof UserMongooseSchema> {
   getJsonWebToken: () => string;
   setVerificationPin: () => Promise<number>;
-  setVerificationPinOffline: () => Promise<number>;
+  sendVerificationEmail: () => Promise<void>;
 }
 
 UserMongooseSchema.methods.getJsonWebToken = function (): string {
-  const payLoad = _.pick(this, ["_id"]);
   const jwt_secret: any = env.jwtPrivateKey;
   const token = jsonwebtoken.sign(_.pick(this, "_id"), jwt_secret);
   return token;
 };
 UserMongooseSchema.methods.setVerificationPin =
   async function (): Promise<number> {
-    const pin = Math.floor(100000 + Math.random() * 900000); // 6-digit pin
+    let pin = 123456;
+    if (env.email !== "") {
+      pin = Math.floor(100000 + Math.random() * 900000); // 6-digit pin
+    }
     this.verificationPin = {
       pin: pin,
       expiresAt: new Date(Date.now() + 30 * 60 * 1000), // Expires in 30 minutes
@@ -43,16 +47,16 @@ UserMongooseSchema.methods.setVerificationPin =
     await this.save();
     return pin;
   };
-
-UserMongooseSchema.methods.setVerificationPinOffline =
-  async function (): Promise<number> {
-    const pin = 123456;
-    this.verificationPin = {
-      pin: pin,
-      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // Expires in 30 minutes
-    };
-    await this.save();
-    return pin;
+UserMongooseSchema.methods.sendVerificationEmail =
+  async function (): Promise<void> {
+    if (env.email !== "") {
+      await sendingMail({
+        from: env.email,
+        to: this.email,
+        subject: "Confirmation Code to register for CFY Store",
+        text: `please enter the following pin in the page to continue<br/>${this.verificationPin.pin}`,
+      });
+    }
   };
 export const UserModel = mongoose.model<UserDoc>("User", UserMongooseSchema);
 

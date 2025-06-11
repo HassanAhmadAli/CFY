@@ -3,14 +3,14 @@ import { signupRoute } from "./routes/auth/signup.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { loginRoute } from "./routes/auth/login.js";
 import { confirmEmailRoute } from "./routes/auth/confirmEmail.js";
-
+import { requestVerificationPin } from "./routes/auth/requestVerificationPin.js";
 import { env } from "./utils/env.js";
-import { publicRouter } from "./routes/simple/public.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
+import { ResetPasswordRoute } from "./routes/auth/resetPassword.js";
 const app = express();
 const corsOptions = {
   origin: /^.*/,
@@ -38,7 +38,7 @@ app.use(
 app.use("/api/signup", signupRoute);
 app.use("/api/login", loginRoute);
 app.use("/api/auth/confirm", confirmEmailRoute);
-
-app.use("/public", publicRouter);
+app.use("/api/auth/requestVerificationPin", requestVerificationPin);
+app.use("/api/auth/resetPassword", ResetPasswordRoute);
 app.use(errorHandler);
 export { app };

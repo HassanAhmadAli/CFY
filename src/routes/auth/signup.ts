@@ -2,10 +2,7 @@ import express, { Request, Response, Router, NextFunction } from "express";
 import { UserModel, UserInputSchema, hashPassword } from "../../models/user.js";
 import { AppError } from "../../utils/errors.js";
 import _ from "lodash";
-import { ZodError } from "../../lib/zod.js";
 import mongoose, { MongooseError } from "mongoose";
-import { sendingMail } from "../../lib/nodemailer.js";
-import { env } from "../../utils/env.js";
 const signupRoute = express.Router();
 
 signupRoute.post(
@@ -26,17 +23,8 @@ signupRoute.post(
       }
       return next(error);
     }
-    if (env.email) {
-      const pin = await user.setVerificationPin();
-      const x = await sendingMail({
-        from: env.email,
-        to: data.email,
-        subject: "Confirmation Code to register for CFY Store",
-        text: `please enter the following pin in the page to continue<br/>${pin}`,
-      });
-    } else {
-      const pin = await user.setVerificationPinOffline();
-    }
+    await user.setVerificationPin();
+    user.sendVerificationEmail();
     const token = user.getJsonWebToken();
     res.header("x-auth-token", token);
     res

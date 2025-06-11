@@ -22,8 +22,6 @@ export const sendingMail = async ({
     return await Transporter.sendMail({ from, to, subject, text });
   } catch (error) {
     console.log(error);
-  } finally {
-    console.log("here");
   }
 };
 
